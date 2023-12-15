@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+group = 'org.eu.hanana.reimu.hnnvideomod'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+repositories {
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
+    maven {
+        url 'https://maven.aliyun.com/repository/central'
+    }
+    mavenLocal()
+    mavenCentral()
+}
+dependencies {
+    compileOnly fileTree("D:\\proj\\hanana_app\\build\\libs\\hanana_app-1.0-SNAPSHOT-all.jar")
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

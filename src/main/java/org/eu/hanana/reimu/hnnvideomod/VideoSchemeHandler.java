@@ -64,6 +64,7 @@ public class VideoSchemeHandler extends CefResourceHandlerAdapter {
         if (url.contains("move")) {
             String[] data = URLDecoder.decode(request.toString().split("\n\n")[1].split("data=")[1]).split("->");
             VlcPlayer player = VideoMod.PLAYER_MAP.get(data[0]);
+            //player.frame.setLocation((int)Float.parseFloat(data[1]),(int)Float.parseFloat(data[2]));
             player.frame.setLocation(Datas.mainFrame.getX()+(int)Float.parseFloat(data[1]),Datas.mainFrame.getY()+(int)Float.parseFloat(data[2]));
             handled=true;
         }
@@ -81,6 +82,7 @@ public class VideoSchemeHandler extends CefResourceHandlerAdapter {
             CefResponse response, IntRef response_length, StringRef redirectUrl) {
         response.setMimeType(mime_type_);
         response.setStatus(200);
+        response.setHeaderByName("Access-Control-Allow-Origin","*",true);
 
         // Set the resulting response length
         response_length.set(data_.length);

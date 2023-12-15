@@ -19,7 +19,7 @@ sourceElements.each(function(index, element) {
 for (let [key, value] of myMap.entries()) {
   $.post('video://player/create', {data: getHashCode(key)+"->"+value });
 }
-setInterval (updateVideos(), 1000);
+setInterval (updateVideos, 1000);
 
 function updateVideos(){
 
@@ -27,6 +27,7 @@ function updateVideos(){
       // 获取元素的屏幕位置
           var rect = key.getBoundingClientRect();
           try{
+            //$.post('video://player/move', {data: getHashCode(key)+"->"+rect.left+screenX+"->"+rect.top+screenY });
             $.post('video://player/move', {data: getHashCode(key)+"->"+rect.left+"->"+rect.top });
           }catch(e){}
     }

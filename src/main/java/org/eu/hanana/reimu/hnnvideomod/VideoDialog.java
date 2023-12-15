@@ -18,7 +18,7 @@ public class VideoDialog extends JDialog {
     public VideoDialog(JFrame owner, VlcPlayer player) {
         super(owner);
         // 设置无边框
-        setUndecorated(true);
+        //setUndecorated(true);
         initComponents();
         play.setText("播放");
         this.player=player;

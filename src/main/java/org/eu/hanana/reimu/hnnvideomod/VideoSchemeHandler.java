@@ -4,17 +4,21 @@
 
 package org.eu.hanana.reimu.hnnvideomod;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.cef.callback.CefCallback;
 import org.cef.handler.CefResourceHandlerAdapter;
 import org.cef.misc.IntRef;
 import org.cef.misc.StringRef;
 import org.cef.network.CefRequest;
 import org.cef.network.CefResponse;
+import org.eu.hanana.reimu.hnnapp.Datas;
 import org.eu.hanana.reimu.hnnapp.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.util.Vector;
 
 /**
  * The example for the second scheme with domain handling is a more
@@ -37,6 +41,7 @@ public class VideoSchemeHandler extends CefResourceHandlerAdapter {
     public synchronized boolean processRequest(CefRequest request, CefCallback callback) {
         boolean handled = false;
         String url = request.getURL();
+        data_ = "".getBytes();
         if (url.contains("plugin.js")) {
             // Build the response html
             String html;
@@ -48,7 +53,20 @@ public class VideoSchemeHandler extends CefResourceHandlerAdapter {
             // Set the resulting mime type
             mime_type_ = "application/javascript";
         }
-
+        if (url.contains("create")) {
+            String[] data = URLDecoder.decode(request.toString().split("\n\n")[1].split("data=")[1]).split("->");
+            VlcPlayer player = new VlcPlayer(Datas.mainFrame);
+            player.play(data[1]);
+            VideoMod.PLAYER_MAP.put(data[0],player);
+            handled=true;
+            mime_type_ = "application/javascript";
+        }
+        if (url.contains("move")) {
+            String[] data = URLDecoder.decode(request.toString().split("\n\n")[1].split("data=")[1]).split("->");
+            VlcPlayer player = VideoMod.PLAYER_MAP.get(data[0]);
+            player.frame.setLocation(Datas.mainFrame.getX()+(int)Float.parseFloat(data[1]),Datas.mainFrame.getY()+(int)Float.parseFloat(data[2]));
+            handled=true;
+        }
         if (handled) {
             // Indicate the headers are available.
             callback.Continue();

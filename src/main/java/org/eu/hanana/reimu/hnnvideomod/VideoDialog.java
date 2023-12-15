@@ -15,8 +15,10 @@ import javax.swing.border.*;
 public class VideoDialog extends JDialog {
     private final VlcPlayer player;
 
-    public VideoDialog(Dialog owner, VlcPlayer player) {
+    public VideoDialog(JFrame owner, VlcPlayer player) {
         super(owner);
+        // 设置无边框
+        setUndecorated(true);
         initComponents();
         play.setText("播放");
         this.player=player;

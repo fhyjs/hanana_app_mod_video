@@ -11,10 +11,10 @@ import java.awt.event.WindowEvent;
 
 public class VlcPlayer {
 
-    private final VideoDialog frame;
+    public final VideoDialog frame;
     public final EmbeddedMediaPlayerComponent mediaPlayerComponent;
 
-    public VlcPlayer(Dialog dialog) {
+    public VlcPlayer(JFrame dialog) {
         frame = new VideoDialog(dialog,this);
         frame.setBounds(100, 100, 800, 600);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

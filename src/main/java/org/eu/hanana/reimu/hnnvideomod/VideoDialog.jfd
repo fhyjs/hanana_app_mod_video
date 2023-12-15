@@ -28,7 +28,7 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.MouseMotionListener", "mouseDragged", "slider1MouseDragged", true ) )
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
-						"columns": 1
+						"columns": 2
 					} ) {
 						name: "panel1"
 						add( new FormComponent( "javax.swing.JButton" ) {
@@ -40,6 +40,11 @@ new FormModel {
 							name: "button2"
 							"text": "停止"
 							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "stopMouseClicked", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button3"
+							"text": "全屏"
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "fullMouseClicked", true ) )
 						} )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {

@@ -55,6 +55,7 @@ public class VlcPlayer {
 
         // 显示窗口
         frame.setVisible(true);
+        frame.setWSize(frame.getSize());
     }
 
     public static void main(String[] args) {

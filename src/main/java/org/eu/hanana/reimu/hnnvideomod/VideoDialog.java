@@ -22,12 +22,17 @@ public class VideoDialog extends JDialog {
         this.player=player;
         slider1.setValue(0);
         slider1.setMaximum(1000000000);
+        dimension=getSize();
+        setResizable(false);
     }
 
     public JPanel getVideo() {
         return video;
     }
-
+    public void setWSize(Dimension dimension){
+        this.dimension=dimension;
+        super.setSize(dimension);
+    }
     private void playMouseClicked(MouseEvent e) {
         if (!player.mediaPlayerComponent.mediaPlayer().status().isPlaying()) {
             player.mediaPlayerComponent.mediaPlayer().controls().play();
@@ -36,6 +41,12 @@ public class VideoDialog extends JDialog {
             player.mediaPlayerComponent.mediaPlayer().controls().pause();
             play.setText("播放");
         }
+    }
+
+    @Override
+    public void setSize(Dimension d) {
+        super.setSize(d);
+        button3.setText(full?"退出全屏":"全屏");
     }
 
     private void stopMouseClicked(MouseEvent e) {
@@ -51,6 +62,37 @@ public class VideoDialog extends JDialog {
     private void slider1MouseDragged(MouseEvent e) {
         player.mediaPlayerComponent.mediaPlayer().controls().setTime((long) (slider1.getValue()/(float)slider1.getMaximum()*player.mediaPlayerComponent.mediaPlayer().media().info().duration()));
     }
+    boolean full=false;
+    Dimension dimension;
+    private void fullMouseClicked(MouseEvent e) {
+        // 获取屏幕大小
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] devices = ge.getScreenDevices();
+
+        // 获取当前鼠标所在的屏幕
+        Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        GraphicsDevice currentDevice = null;
+
+        for (GraphicsDevice device : devices) {
+            GraphicsConfiguration config = device.getDefaultConfiguration();
+            Rectangle bounds = config.getBounds();
+            if (bounds.contains(mouseLocation)) {
+                currentDevice = device;
+                break;
+            }
+        }
+        if (!full) {
+            if (currentDevice != null) {
+                full = true;
+                setSize(currentDevice.getDefaultConfiguration().getBounds().getSize());
+                setLocation(0, 0);
+                setAlwaysOnTop(true);
+            }
+        }else {
+            full=false;
+            setSize(dimension);
+        }
+    }
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         dialogPane = new JPanel();
@@ -61,6 +103,7 @@ public class VideoDialog extends JDialog {
         panel1 = new JPanel();
         play = new JButton();
         button2 = new JButton();
+        button3 = new JButton();
 
         //======== this ========
         var contentPane = getContentPane();
@@ -98,7 +141,7 @@ public class VideoDialog extends JDialog {
 
                 //======== panel1 ========
                 {
-                    panel1.setLayout(new GridLayout(1, 1));
+                    panel1.setLayout(new GridLayout(1, 2));
 
                     //---- play ----
                     play.setText("\u64ad\u653e");
@@ -119,6 +162,16 @@ public class VideoDialog extends JDialog {
                         }
                     });
                     panel1.add(button2);
+
+                    //---- button3 ----
+                    button3.setText("\u5168\u5c4f");
+                    button3.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            fullMouseClicked(e);
+                        }
+                    });
+                    panel1.add(button3);
                 }
                 panel2.add(panel1);
             }
@@ -139,5 +192,6 @@ public class VideoDialog extends JDialog {
     private JPanel panel1;
     private JButton play;
     private JButton button2;
+    private JButton button3;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

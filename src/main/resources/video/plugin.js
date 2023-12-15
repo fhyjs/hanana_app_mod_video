@@ -19,7 +19,7 @@ sourceElements.each(function(index, element) {
 for (let [key, value] of myMap.entries()) {
   $.post('video://player/create', {data: getHashCode(key)+"->"+value });
 }
-setInterval (updateVideos, 1000);
+//setInterval (updateVideos, 1000);
 
 function updateVideos(){
 

@@ -1,5 +1,6 @@
 package org.eu.hanana.reimu.hnnvideomod;
 
+import org.eu.hanana.reimu.hnnapp.Datas;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
@@ -27,6 +28,7 @@ public class VlcPlayer {
             @Override
             public void windowClosed(WindowEvent e) {
                 mediaPlayerComponent.release(); // 释放资源
+                Datas.cefBrowser.canGoBack();
             }
         });
         frame.setVisible(true);

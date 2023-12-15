@@ -15,6 +15,9 @@ tasks.withType(JavaCompile) {
 }
 repositories {
     maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    maven {
         url 'https://maven.aliyun.com/repository/public/'
     }
     maven {
@@ -25,7 +28,7 @@ repositories {
 }
 dependencies {
     compileOnly fileTree("D:\\proj\\hanana_app\\build\\libs\\hanana_app-1.0-SNAPSHOT-all.jar")
-
+    implementation 'uk.co.caprica:vlcj:4.8.2'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }

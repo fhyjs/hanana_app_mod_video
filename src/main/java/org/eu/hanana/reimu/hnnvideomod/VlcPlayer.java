@@ -14,15 +14,16 @@ public class VlcPlayer {
 
     public final VideoDialog frame;
     public final EmbeddedMediaPlayerComponent mediaPlayerComponent;
+    public final Component videoComponent;
 
     public VlcPlayer(JFrame dialog) {
+        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+
         frame = new VideoDialog(dialog,this);
         frame.setBounds(100, 100, 800, 600);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-
-        frame.getVideo().add(mediaPlayerComponent);
+        videoComponent = frame.getVideo().add(mediaPlayerComponent);
 
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -32,6 +33,7 @@ public class VlcPlayer {
             }
         });
         frame.setVisible(true);
+        frame.init();
     }
 
     public void play(String mediaPath) {

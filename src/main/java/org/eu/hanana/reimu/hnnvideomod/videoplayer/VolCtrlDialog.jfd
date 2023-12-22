@@ -1,0 +1,30 @@
+JFDML JFormDesigner: "8.1.1.0.298" Java: "17.0.8" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			"title": "音量"
+			add( new FormComponent( "javax.swing.JSlider" ) {
+				name: "slider1"
+				"orientation": 1
+				"maximum": 200
+				addEvent( new FormEvent( "java.beans.VetoableChangeListener", "vetoableChange", "slider1VetoableChange", true ) )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+			add( new FormComponent( "javax.swing.JTextArea" ) {
+				name: "label1"
+				"editable": false
+				"text": "grtg"
+				"cursor": new java.awt.Cursor( 0 )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "South"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 45, 5 )
+			"size": new java.awt.Dimension( 80, 280 )
+		} )
+	}
+}

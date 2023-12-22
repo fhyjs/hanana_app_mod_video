@@ -12,10 +12,8 @@ new FormModel {
 					name: "contentPanel"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) ) {
 						name: "fullvideo"
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+						add( new FormContainer( "javax.swing.JLayeredPane", new FormLayoutManager( class javax.swing.JLayeredPane ) ) {
 							name: "video"
-							addEvent( new FormEvent( "java.awt.event.MouseMotionListener", "mouseMoved", "videoMouseMoved", true ) )
-							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "videoMouseClicked", true ) )
 							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
 								"columns": 4
 							} ) {
@@ -26,8 +24,9 @@ new FormModel {
 									addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnVol", true ) )
 								} )
 								add( new FormComponent( "javax.swing.JButton" ) {
-									name: "button4"
-									"text": "text"
+									name: "btnspeed"
+									"text": "倍速"
+									addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnspeed", true ) )
 								} )
 								add( new FormComponent( "javax.swing.JButton" ) {
 									name: "button5"
@@ -37,11 +36,11 @@ new FormModel {
 									name: "button6"
 									"text": "text"
 								} )
-							}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-								"x": 0
-								"y": 180
+							}, new FormLayoutConstraints( null ) {
 								"width": 375
 								"height": 55
+								"x": 0
+								"y": 0
 							} )
 						} )
 					} )

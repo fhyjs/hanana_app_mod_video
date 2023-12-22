@@ -4,6 +4,8 @@
 
 package org.eu.hanana.reimu.hnnvideomod;
 
+import org.eu.hanana.reimu.hnnvideomod.videoplayer.Danmaku;
+import org.eu.hanana.reimu.hnnvideomod.videoplayer.SpeedCtrlDialog;
 import org.eu.hanana.reimu.hnnvideomod.videoplayer.VolCtrlDialog;
 
 import java.awt.*;
@@ -17,6 +19,7 @@ import javax.swing.border.*;
 public class VideoDialog extends JDialog {
     public final VlcPlayer player;
     public int huiLastTime;
+    public Danmaku danmaku;
 
     public VideoDialog(JFrame owner, VlcPlayer player) {
         super(owner);
@@ -35,6 +38,13 @@ public class VideoDialog extends JDialog {
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 init();
+            }
+        });
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                super.windowOpened(e);
+                player.mediaPlayerComponent.mediaPlayer().overlay().enable(true);
             }
         });
         Thread s1ticker = new Thread(() -> {
@@ -65,6 +75,7 @@ public class VideoDialog extends JDialog {
                 showHud();
             }
         });
+        player.mediaPlayerComponent.mediaPlayer().overlay().set(new Danmaku(this));
     }
     private void s1Ticker() throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()){
@@ -81,7 +92,7 @@ public class VideoDialog extends JDialog {
             Thread.sleep(1000);
         }
     }
-    public JPanel getVideo() {
+    public JLayeredPane getVideo() {
         return video;
     }
     public void setWSize(Dimension dimension){
@@ -97,7 +108,6 @@ public class VideoDialog extends JDialog {
             play.setText("播放");
         }
     }
-
     @Override
     public void setSize(Dimension d) {
         super.setSize(d);
@@ -151,7 +161,7 @@ public class VideoDialog extends JDialog {
     }
     public void init() {
         player.videoComponent.setSize(fullvideo.getSize());
-        player.mediaPlayerComponent.videoSurfaceComponent().setSize(player.videoComponent.getSize());
+        player.mediaPlayerComponent.videoSurfaceComponent().setSize(player.videoComponent.getWidth()-100,player.videoComponent.getHeight()-100);
         hud.setSize((int) player.mediaPlayerComponent.getSize().getWidth(), (int) (player.mediaPlayerComponent.getSize().getHeight()*0.1));
         hud.setLocation(0,player.mediaPlayerComponent.getHeight()-hud.getHeight());
         validate();
@@ -171,15 +181,20 @@ public class VideoDialog extends JDialog {
         JDialog dialog = new VolCtrlDialog(this);
         dialog.setVisible(true);
     }
+
+    private void btnspeed(ActionEvent e) {
+        JDialog dialog = new SpeedCtrlDialog(this);
+        dialog.setVisible(true);
+    }
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         dialogPane = new JPanel();
         contentPanel = new JPanel();
         fullvideo = new JPanel();
-        video = new JPanel();
+        video = new JLayeredPane();
         hud = new JPanel();
         btnVol = new JButton();
-        button4 = new JButton();
+        btnspeed = new JButton();
         button5 = new JButton();
         button6 = new JButton();
         panel2 = new JPanel();
@@ -208,19 +223,6 @@ public class VideoDialog extends JDialog {
 
                     //======== video ========
                     {
-                        video.addMouseMotionListener(new MouseMotionAdapter() {
-                            @Override
-                            public void mouseMoved(MouseEvent e) {
-                                videoMouseMoved(e);
-                            }
-                        });
-                        video.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                videoMouseClicked(e);
-                            }
-                        });
-                        video.setLayout(null);
 
                         //======== hud ========
                         {
@@ -231,9 +233,10 @@ public class VideoDialog extends JDialog {
                             btnVol.addActionListener(e -> btnVol(e));
                             hud.add(btnVol);
 
-                            //---- button4 ----
-                            button4.setText("text");
-                            hud.add(button4);
+                            //---- btnspeed ----
+                            btnspeed.setText("\u500d\u901f");
+                            btnspeed.addActionListener(e -> btnspeed(e));
+                            hud.add(btnspeed);
 
                             //---- button5 ----
                             button5.setText("text");
@@ -243,23 +246,8 @@ public class VideoDialog extends JDialog {
                             button6.setText("text");
                             hud.add(button6);
                         }
-                        video.add(hud);
-                        hud.setBounds(0, 180, 375, 55);
-
-                        {
-                            // compute preferred size
-                            Dimension preferredSize = new Dimension();
-                            for(int i = 0; i < video.getComponentCount(); i++) {
-                                Rectangle bounds = video.getComponent(i).getBounds();
-                                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
-                                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
-                            }
-                            Insets insets = video.getInsets();
-                            preferredSize.width += insets.right;
-                            preferredSize.height += insets.bottom;
-                            video.setMinimumSize(preferredSize);
-                            video.setPreferredSize(preferredSize);
-                        }
+                        video.add(hud, JLayeredPane.DEFAULT_LAYER);
+                        hud.setBounds(0, 0, 375, 55);
                     }
                     fullvideo.add(video);
                 }
@@ -328,10 +316,10 @@ public class VideoDialog extends JDialog {
     private JPanel dialogPane;
     private JPanel contentPanel;
     private JPanel fullvideo;
-    private JPanel video;
+    private JLayeredPane video;
     private JPanel hud;
     private JButton btnVol;
-    private JButton button4;
+    private JButton btnspeed;
     private JButton button5;
     private JButton button6;
     private JPanel panel2;

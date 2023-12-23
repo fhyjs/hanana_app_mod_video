@@ -76,6 +76,7 @@ public class VideoDialog extends JDialog {
             }
         });
         player.mediaPlayerComponent.mediaPlayer().overlay().set(new Danmaku(this));
+        danmaku = (Danmaku) player.mediaPlayerComponent.mediaPlayer().overlay().get();
     }
     private void s1Ticker() throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()){
@@ -120,6 +121,7 @@ public class VideoDialog extends JDialog {
     }
     public void timeChanged(long newTime) {
         slider1.setValue((int) ((float)newTime/(float) player.mediaPlayerComponent.mediaPlayer().media().info().duration()*slider1.getMaximum()));
+        danmaku.timeChanged(newTime);
     }
     public void stop() {
         play.setText("播放");

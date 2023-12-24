@@ -14,12 +14,17 @@ import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import static org.eu.hanana.reimu.hnnvideomod.Utils.areDoublesEqual;
 
 /**
  * @author administer
@@ -31,7 +36,7 @@ public class Danmaku extends JDialog {
     private final VideoDialog owner;
     // 创建 Random 对象
     private final Random random = new Random();
-    private DanmakuPanel danmakuPanel;
+    private final DanmakuPanel danmakuPanel;
     public Danmaku(VideoDialog owner) {
         super(owner);
         this.owner=owner;
@@ -39,24 +44,33 @@ public class Danmaku extends JDialog {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));  // 设置背景透明
         add(danmakuPanel=new DanmakuPanel());
+        owner.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                danmakuPanel.setSize(getSize());
+                System.out.println(danmakuPanel.getSize());
+            }
+        });
     }
 
     public void timeChanged(long newTime) {
         for (DanmakuData danmakuDatum : danmakuData) {
-            if (danmakuDatum.timestamp==newTime/1000f){
+            if (areDoublesEqual(danmakuDatum.timestamp,newTime/1000d)&&danmakuDatum.state!= DanmakuData.DanmakuState.SHOWN){
                 danmakuDatum.state= DanmakuData.DanmakuState.SHOWN;
                 onScreenDanmakuData.add(danmakuDatum);
-                danmakuDatum.x=getWidth();
-                danmakuDatum.y= random.nextInt(getHeight() + 1);
+                danmakuDatum.x=getSize().width;
+                danmakuDatum.y= random.nextInt(getSize().height + 1);
             }
         }
         danmakuPanel.repaint();
     }
 
     private class DanmakuPanel extends JPanel {
+        private final Color bgColor = new Color(0, 0, 0, 0);
         private DanmakuPanel(){
             super();
-            setBackground(new Color(0, 0, 0, 0));  // 设置背景透明
+            setBackground(bgColor);  // 设置背景透明
             loadDanmaku();
         }
         public void loadDanmaku(){
@@ -65,13 +79,36 @@ public class Danmaku extends JDialog {
         @Override
         public void paint(Graphics g) {
             super.paint(g);
-            for (DanmakuData onScreenDanmakuDatum : onScreenDanmakuData) {
+            Graphics2D g2d = null;
+            if (g instanceof Graphics2D) {
+                 g2d = ((Graphics2D) g);
+            }
+
+            assert g2d != null;
+            g2d.setBackground(bgColor);
+            g.clearRect(0,0,getWidth(),getHeight());
+
+            Iterator<DanmakuData> iterator = onScreenDanmakuData.iterator();
+            while (iterator.hasNext()) {
+                DanmakuData onScreenDanmakuDatum = iterator.next();
                 g.setColor(new Color(onScreenDanmakuDatum.fontColor));
-                g.drawString(onScreenDanmakuDatum.content,onScreenDanmakuDatum.x,onScreenDanmakuDatum.y);
-                onScreenDanmakuDatum.x-= (int) (getWidth()*0.2);
-                if (onScreenDanmakuDatum.y<0){
-                    onScreenDanmakuDatum.state= DanmakuData.DanmakuState.HIDDEN;
-                    onScreenDanmakuData.remove(onScreenDanmakuDatum);
+
+                // 缩放文本
+                double scale = onScreenDanmakuDatum.fontSize/25d*2; // 设置缩放比例
+                g2d.scale(scale, scale);
+
+                // 绘制缩放后的文本
+                g.drawString(onScreenDanmakuDatum.content,
+                        (int) (onScreenDanmakuDatum.x / scale),
+                        (int) (onScreenDanmakuDatum.y / scale));
+
+                // 恢复缩放
+                g2d.scale(1 / scale, 1 / scale);
+
+                onScreenDanmakuDatum.x -= (int) (getWidth() * 0.05);
+                if (onScreenDanmakuDatum.x < 0) {
+                    onScreenDanmakuDatum.state = DanmakuData.DanmakuState.HIDDEN;
+                    iterator.remove(); // 使用迭代器的remove方法来安全地移除元素
                 }
             }
         }
@@ -80,7 +117,7 @@ public class Danmaku extends JDialog {
         public DanmakuState state;
         public int x;
         public int y;
-        public float timestamp;
+        public double timestamp;
         public int mode;
         public int fontSize;
         public int fontColor;
@@ -124,7 +161,7 @@ public class Danmaku extends JDialog {
                     DanmakuData data = new DanmakuData();
                     data.danmakuID = danmakuID;
                     data.fontColor = Integer.parseInt(fontColor);
-                    data.timestamp = Float.parseFloat(timestamp);
+                    data.timestamp = Double.parseDouble(timestamp);
                     data.danmakuPoolType = Integer.parseInt(danmakuPoolType);
                     data.fontSize = Integer.parseInt(fontSize);
                     data.mode = Integer.parseInt(mode);
@@ -150,7 +187,7 @@ public class Danmaku extends JDialog {
 
         //======== this ========
         var contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(1, 1));
+        contentPane.setLayout(new GridLayout());
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on

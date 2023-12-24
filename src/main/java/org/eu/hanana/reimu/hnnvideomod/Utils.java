@@ -66,4 +66,10 @@ public class Utils {
             return null;
         }
     }
+    // 比较两个double是否相等
+    public static boolean areDoublesEqual(double d1, double d2) {
+        double epsilon = 1; // 设置一个很小的阈值
+
+        return Math.abs(d1 - d2) < epsilon;
+    }
 }

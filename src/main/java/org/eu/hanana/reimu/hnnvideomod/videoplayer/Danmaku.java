@@ -4,6 +4,7 @@
 
 package org.eu.hanana.reimu.hnnvideomod.videoplayer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.eu.hanana.reimu.hnnvideomod.Utils;
 import org.eu.hanana.reimu.hnnvideomod.VideoDialog;
 import org.w3c.dom.Document;
@@ -18,11 +19,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 import static org.eu.hanana.reimu.hnnvideomod.Utils.areDoublesEqual;
 
@@ -37,6 +35,7 @@ public class Danmaku extends JDialog {
     // 创建 Random 对象
     private final Random random = new Random();
     private final DanmakuPanel danmakuPanel;
+    public float danmakuSpeed=0.05f;
     public Danmaku(VideoDialog owner) {
         super(owner);
         this.owner=owner;
@@ -49,7 +48,7 @@ public class Danmaku extends JDialog {
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 danmakuPanel.setSize(getSize());
-                System.out.println(danmakuPanel.getSize());
+                //System.out.println(danmakuPanel.getSize());
             }
         });
     }
@@ -59,13 +58,85 @@ public class Danmaku extends JDialog {
             if (areDoublesEqual(danmakuDatum.timestamp,newTime/1000d)&&danmakuDatum.state!= DanmakuData.DanmakuState.SHOWN){
                 danmakuDatum.state= DanmakuData.DanmakuState.SHOWN;
                 onScreenDanmakuData.add(danmakuDatum);
-                danmakuDatum.x=getSize().width;
-                danmakuDatum.y= random.nextInt(getSize().height + 1);
+                initDanmaku(danmakuDatum);
             }
         }
         danmakuPanel.repaint();
     }
-
+    public void initDanmaku(DanmakuData danmakuData) {
+        danmakuData.shownTime=0;
+        switch (danmakuData.mode) {
+            case 1,2,3:
+                danmakuData.x = getSize().width;
+                danmakuData.y = random.nextInt(getSize().height + 1);
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(danmakuData.content);
+                break;
+            case 4:
+                danmakuData.x = getSize().width/2;
+                danmakuData.y = getSize().height-random.nextInt((int) (getSize().height*0.9 + 10));
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(danmakuData.content);
+                break;
+            case 5:
+                danmakuData.x = getSize().width/2;
+                danmakuData.y = random.nextInt((int) (getSize().height*0.1 + 10));
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(danmakuData.content);
+                break;
+            case 6:
+                danmakuData.x = 0;
+                danmakuData.y = random.nextInt(getSize().height + 1);
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(danmakuData.content);
+                break;
+            case 7:
+                List<String> data = danmakuData.getPositionData();
+                float x=Float.parseFloat(data.get(0));
+                float y=Float.parseFloat(data.get(1));
+                if (x<1&&y<1){
+                    danmakuData.x= (int) (getSize().width*x);
+                    danmakuData.y= (int) (getSize().height*y);
+                }else {
+                    danmakuData.x= (int) x;
+                    danmakuData.y= (int) y;
+                }
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(data.get(4));
+                String[] opacities = StringEscapeUtils.unescapeHtml4(data.get(2)).substring(1,data.get(2).length()-1).split("-");
+                danmakuData.opacity=Float.parseFloat(opacities[0]);
+                break;
+            default:
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(danmakuData.content);
+                break;
+        }
+    }
+    public void moveDanmaku(DanmakuData danmakuData, Iterator<DanmakuData> iterator) {
+        danmakuData.shownTime++;
+        switch (danmakuData.mode) {
+            case 1,2,3:
+                danmakuData.x -= (int) (getWidth() * danmakuSpeed);
+                if (danmakuData.x < 0) {
+                    removeDanmaku(danmakuData,iterator);
+                }
+                break;
+            case 4,5:
+                if (danmakuData.shownTime>30)
+                    removeDanmaku(danmakuData,iterator);
+                break;
+            case 6:
+                danmakuData.x += (int) (getWidth() * danmakuSpeed);
+                if (danmakuData.x > getSize().getWidth()) {
+                    removeDanmaku(danmakuData,iterator);
+                }
+                break;
+            case 7:
+                List<String> data = danmakuData.getPositionData();
+                float progress = Float.parseFloat(data.get(3))/danmakuData.shownTime;
+                if (progress>1)
+                    removeDanmaku(danmakuData,iterator);
+                break;
+        }
+    }
+    public void removeDanmaku(DanmakuData danmakuData, Iterator<DanmakuData> iterator) {
+        danmakuData.state = DanmakuData.DanmakuState.HIDDEN;
+        iterator.remove(); // 使用迭代器的remove方法来安全地移除元素
+    }
     private class DanmakuPanel extends JPanel {
         private final Color bgColor = new Color(0, 0, 0, 0);
         private DanmakuPanel(){
@@ -74,7 +145,7 @@ public class Danmaku extends JDialog {
             loadDanmaku();
         }
         public void loadDanmaku(){
-            danmakuData.addAll(DanmakuData.getDanmakus(Utils.getAssets(DanmakuData.class.getClassLoader(),"video/tst.xml")));
+            danmakuData.addAll(DanmakuData.getDanmakus(Utils.getAssets(DanmakuData.class.getClassLoader(),"video/tst1.xml")));
         }
         @Override
         public void paint(Graphics g) {
@@ -91,25 +162,23 @@ public class Danmaku extends JDialog {
             Iterator<DanmakuData> iterator = onScreenDanmakuData.iterator();
             while (iterator.hasNext()) {
                 DanmakuData onScreenDanmakuDatum = iterator.next();
-                g.setColor(new Color(onScreenDanmakuDatum.fontColor));
+                Color color = new Color(onScreenDanmakuDatum.fontColor);
+                g.setColor(new Color(color.getRed(),color.getGreen(),color.getBlue(),(int)(255*onScreenDanmakuDatum.opacity)));
 
                 // 缩放文本
-                double scale = onScreenDanmakuDatum.fontSize/25d*2; // 设置缩放比例
+                double scale = onScreenDanmakuDatum.fontSize/25d*1.5; // 设置缩放比例
                 g2d.scale(scale, scale);
 
                 // 绘制缩放后的文本
-                g.drawString(onScreenDanmakuDatum.content,
+                g.drawString(onScreenDanmakuDatum.text,
                         (int) (onScreenDanmakuDatum.x / scale),
                         (int) (onScreenDanmakuDatum.y / scale));
 
                 // 恢复缩放
                 g2d.scale(1 / scale, 1 / scale);
 
-                onScreenDanmakuDatum.x -= (int) (getWidth() * 0.05);
-                if (onScreenDanmakuDatum.x < 0) {
-                    onScreenDanmakuDatum.state = DanmakuData.DanmakuState.HIDDEN;
-                    iterator.remove(); // 使用迭代器的remove方法来安全地移除元素
-                }
+                moveDanmaku(onScreenDanmakuDatum,iterator);
+
             }
         }
     }
@@ -118,7 +187,22 @@ public class Danmaku extends JDialog {
         public int x;
         public int y;
         public double timestamp;
+        public float opacity=1;
+        /**
+         * 弹幕类型<br/>
+         * 1 2 3：普通弹幕<br/>
+         * 4：底部弹幕<br/>
+         * 5：顶部弹幕<br/>
+         * 6：逆向弹幕<br/>
+         * 7：高级弹幕<br/>
+         * 8：代码弹幕<br/>
+         * 9：BAS弹幕（pool必须为2）<br/>
+         */
         public int mode;
+        /**
+         * 显示时间
+         */
+        public int shownTime;
         public int fontSize;
         public int fontColor;
         public long timeInMilliseconds;
@@ -126,7 +210,17 @@ public class Danmaku extends JDialog {
         public String userID;
         public String danmakuID;
         public String content;
-
+        public String text;
+        public List<String> positionData;
+        public List<String> getPositionData(){
+            if (positionData!=null) return positionData;
+            List<String> list = new ArrayList<>();
+            if (!content.startsWith("[")||!content.endsWith("]")) throw new IllegalArgumentException("format err");
+            content=content.substring(1,content.length()-1);
+            Collections.addAll(list, content.split(","));
+            positionData=list;
+            return list;
+        }
         public DanmakuData(){
             this.state=DanmakuState.HIDDEN;
         }
@@ -167,7 +261,7 @@ public class Danmaku extends JDialog {
                     data.mode = Integer.parseInt(mode);
                     data.timeInMilliseconds = Long.parseLong(timeInMilliseconds);
                     data.userID = userID;
-                    data.content=content;
+                    data.content= content;
                     danmakuDataList.add(data);
                 }
 
@@ -176,6 +270,7 @@ public class Danmaku extends JDialog {
             }
             return danmakuDataList;
         }
+
         public enum DanmakuState{
             HIDDEN,
             SHOWN,

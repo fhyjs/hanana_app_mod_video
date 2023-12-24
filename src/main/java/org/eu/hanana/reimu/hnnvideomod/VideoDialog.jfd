@@ -29,8 +29,9 @@ new FormModel {
 									addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnspeed", true ) )
 								} )
 								add( new FormComponent( "javax.swing.JButton" ) {
-									name: "button5"
-									"text": "text"
+									name: "btnDanmaku"
+									"text": "弹幕"
+									addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnDanmaku", true ) )
 								} )
 								add( new FormComponent( "javax.swing.JButton" ) {
 									name: "button6"

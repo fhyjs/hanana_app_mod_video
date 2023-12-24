@@ -45,6 +45,7 @@ public class VideoDialog extends JDialog {
             public void windowOpened(WindowEvent e) {
                 super.windowOpened(e);
                 player.mediaPlayerComponent.mediaPlayer().overlay().enable(true);
+                btnDanmaku.setText("弹幕:开");
             }
         });
         Thread s1ticker = new Thread(() -> {
@@ -188,6 +189,16 @@ public class VideoDialog extends JDialog {
         JDialog dialog = new SpeedCtrlDialog(this);
         dialog.setVisible(true);
     }
+
+    private void btnDanmaku(ActionEvent e) {
+        if (player.mediaPlayerComponent.mediaPlayer().overlay().enabled()){
+            player.mediaPlayerComponent.mediaPlayer().overlay().enable(false);
+            btnDanmaku.setText("弹幕:关");
+        }else {
+            player.mediaPlayerComponent.mediaPlayer().overlay().enable(true);
+            btnDanmaku.setText("弹幕:开");
+        }
+    }
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         dialogPane = new JPanel();
@@ -197,7 +208,7 @@ public class VideoDialog extends JDialog {
         hud = new JPanel();
         btnVol = new JButton();
         btnspeed = new JButton();
-        button5 = new JButton();
+        btnDanmaku = new JButton();
         button6 = new JButton();
         panel2 = new JPanel();
         slider1 = new JSlider();
@@ -240,9 +251,10 @@ public class VideoDialog extends JDialog {
                             btnspeed.addActionListener(e -> btnspeed(e));
                             hud.add(btnspeed);
 
-                            //---- button5 ----
-                            button5.setText("text");
-                            hud.add(button5);
+                            //---- btnDanmaku ----
+                            btnDanmaku.setText("\u5f39\u5e55");
+                            btnDanmaku.addActionListener(e -> btnDanmaku(e));
+                            hud.add(btnDanmaku);
 
                             //---- button6 ----
                             button6.setText("text");
@@ -322,7 +334,7 @@ public class VideoDialog extends JDialog {
     private JPanel hud;
     private JButton btnVol;
     private JButton btnspeed;
-    private JButton button5;
+    private JButton btnDanmaku;
     private JButton button6;
     private JPanel panel2;
     private JSlider slider1;

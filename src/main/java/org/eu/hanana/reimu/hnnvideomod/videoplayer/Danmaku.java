@@ -19,6 +19,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
@@ -97,8 +98,8 @@ public class Danmaku extends JDialog {
                     danmakuData.x= (int) x;
                     danmakuData.y= (int) y;
                 }
-                danmakuData.text=StringEscapeUtils.unescapeHtml4(data.get(4));
-                String[] opacities = StringEscapeUtils.unescapeHtml4(data.get(2)).substring(1,data.get(2).length()-1).split("-");
+                danmakuData.text=StringEscapeUtils.unescapeHtml4(data.get(4)).substring(1,StringEscapeUtils.unescapeHtml4(data.get(4)).length()-1);
+                String[] opacities = StringEscapeUtils.unescapeHtml4(data.get(2)).substring(1,StringEscapeUtils.unescapeHtml4(data.get(2)).length()-1).split("-");
                 danmakuData.opacity=Float.parseFloat(opacities[0]);
                 break;
             default:
@@ -127,9 +128,15 @@ public class Danmaku extends JDialog {
                 break;
             case 7:
                 List<String> data = danmakuData.getPositionData();
-                float progress = Float.parseFloat(data.get(3))/danmakuData.shownTime;
+                String[] opacities = StringEscapeUtils.unescapeHtml4(data.get(2)).substring(1,data.get(2).length()-1).split("-");
+                float progress = danmakuData.shownTime/Float.parseFloat(data.get(3))/4;
                 if (progress>1)
                     removeDanmaku(danmakuData,iterator);
+                danmakuData.opacity+=(Float.parseFloat(opacities[1])-danmakuData.opacity)*progress;
+                if (data.size()>=9){
+                    danmakuData.x+= (int) ((Float.parseFloat(data.get(7))-danmakuData.x)*progress);
+                    danmakuData.y+= (int) ((Float.parseFloat(data.get(8))-danmakuData.y)*progress);
+                }
                 break;
         }
     }
@@ -168,7 +175,6 @@ public class Danmaku extends JDialog {
                 // 缩放文本
                 double scale = onScreenDanmakuDatum.fontSize/25d*1.5; // 设置缩放比例
                 g2d.scale(scale, scale);
-
                 // 绘制缩放后的文本
                 g.drawString(onScreenDanmakuDatum.text,
                         (int) (onScreenDanmakuDatum.x / scale),

@@ -37,9 +37,11 @@ public class Danmaku extends JDialog {
     private final Random random = new Random();
     private final DanmakuPanel danmakuPanel;
     public float danmakuSpeed=0.05f;
+    public boolean ready;
     public Danmaku(VideoDialog owner) {
         super(owner);
         this.owner=owner;
+        ready=false;
         setUndecorated(true);  // 设置无边框
         initComponents();
         setBackground(new Color(0, 0, 0, 0));  // 设置背景透明
@@ -152,7 +154,9 @@ public class Danmaku extends JDialog {
             loadDanmaku();
         }
         public void loadDanmaku(){
-            danmakuData.addAll(DanmakuData.getDanmakus(Utils.getAssets(DanmakuData.class.getClassLoader(),"video/tst1.xml")));
+            if (owner.danmakuStr!=null)
+                danmakuData.addAll(DanmakuData.getDanmakus(owner.danmakuStr));
+            ready=true;
         }
         @Override
         public void paint(Graphics g) {

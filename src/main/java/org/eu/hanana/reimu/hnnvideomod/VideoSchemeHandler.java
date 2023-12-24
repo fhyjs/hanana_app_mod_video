@@ -55,7 +55,15 @@ public class VideoSchemeHandler extends CefResourceHandlerAdapter {
         }
         if (url.contains("create")) {
             String[] data = URLDecoder.decode(request.toString().split("\n\n")[1].split("data=")[1]).split("->");
-            VlcPlayer player = new VlcPlayer(Datas.mainFrame);
+            String dData=null;
+            if (data[2]!=null){
+                try {
+                    dData= org.eu.hanana.reimu.hnnvideomod.Utils.fetchTextFromURL(data[2]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            VlcPlayer player = new VlcPlayer(Datas.mainFrame,dData);
             player.play(data[1]);
             VideoMod.PLAYER_MAP.put(data[0],player);
             handled=true;

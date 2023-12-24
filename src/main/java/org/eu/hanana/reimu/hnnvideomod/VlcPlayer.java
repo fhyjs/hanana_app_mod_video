@@ -13,13 +13,15 @@ import java.awt.event.WindowEvent;
 public class VlcPlayer {
 
     public final VideoDialog frame;
+    public boolean ready=false;
     public final EmbeddedMediaPlayerComponent mediaPlayerComponent;
     public final Component videoComponent;
+    public String danmakuStr;
 
-    public VlcPlayer(JFrame dialog) {
+    public VlcPlayer(JFrame dialog, String danmakuStr) {
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 
-        frame = new VideoDialog(dialog,this);
+        frame = new VideoDialog(dialog,this,danmakuStr);
         frame.setBounds(100, 100, 800, 600);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
@@ -60,11 +62,12 @@ public class VlcPlayer {
         // 显示窗口
         frame.setVisible(true);
         frame.setWSize(frame.getSize());
+        ready=true;
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            VlcPlayer player = new VlcPlayer(null);
+            VlcPlayer player = new VlcPlayer(null,Utils.getAssets(VlcPlayer.class.getClassLoader(),"video/tst.xml"));
             // 替换为实际视频文件的路径
             player.play("C:\\Users\\a\\Downloads\\Video\\av12.mp4");
         });

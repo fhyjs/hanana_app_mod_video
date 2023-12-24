@@ -1,7 +1,11 @@
 package org.eu.hanana.reimu.hnnvideomod;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -71,5 +75,26 @@ public class Utils {
         double epsilon = 1; // 设置一个很小的阈值
 
         return Math.abs(d1 - d2) < epsilon;
+    }
+    public static String fetchTextFromURL(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        URLConnection urlConnection = url.openConnection();
+
+        // 设置连接超时时间，单位为毫秒（可选）
+        urlConnection.setConnectTimeout(5000);
+
+        try (InputStream inputStream = urlConnection.getInputStream();
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+
+            return stringBuilder.toString();
+        }
     }
 }

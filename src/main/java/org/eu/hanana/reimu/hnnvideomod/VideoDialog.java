@@ -19,9 +19,10 @@ import javax.swing.border.*;
 public class VideoDialog extends JDialog {
     public final VlcPlayer player;
     public int huiLastTime;
+    public String danmakuStr;
     public Danmaku danmaku;
 
-    public VideoDialog(JFrame owner, VlcPlayer player) {
+    public VideoDialog(JFrame owner, VlcPlayer player,String danmakuStr) {
         super(owner);
         // 设置无边框
         //setUndecorated(true);
@@ -33,6 +34,7 @@ public class VideoDialog extends JDialog {
         dimension=getSize();
         //setResizable(false);
         setTitle("视频播放器(网页后退关闭)");
+        this.danmakuStr=danmakuStr;
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -102,6 +104,10 @@ public class VideoDialog extends JDialog {
         super.setSize(dimension);
     }
     private void playMouseClicked(MouseEvent e) {
+        if (!danmaku.ready||!player.ready) {
+            JOptionPane.showMessageDialog(this,"播放器没有加载完成!");
+            return;
+        }
         if (!player.mediaPlayerComponent.mediaPlayer().status().isPlaying()) {
             player.mediaPlayerComponent.mediaPlayer().controls().play();
             play.setText("暂停");

@@ -17,7 +17,22 @@ sourceElements.each(function(index, element) {
 });
 // 迭代 Map 的键值对
 for (let [key, value] of myMap.entries()) {
-  $.post('video://player/create', {data: getHashCode(key)+"->"+value });
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '//hanana.eu.org/hanana-apps/danmaku.json', true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        // 在这里处理JSON数据
+        var data = JSON.parse(xhr.responseText);
+        var dData="null";
+        if(data.hasOwnProperty(value)){
+            dData=data[value];
+        }
+        $.post('video://player/create', {data: getHashCode(key)+"->"+value+"->"+dData });
+      } else if (xhr.readyState == 4 && xhr.status != 200) {
+        console.error('发生错误：', xhr.status);
+      }
+    };
+    xhr.send();
 }
 //setInterval (updateVideos, 1000);
 

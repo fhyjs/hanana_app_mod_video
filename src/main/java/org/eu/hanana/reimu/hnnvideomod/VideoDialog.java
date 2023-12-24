@@ -39,7 +39,20 @@ public class VideoDialog extends JDialog {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                init();
+                new Thread(()->{
+                    while (true){
+                        if (player.videoComponent!=null) {
+                            init();
+                            break;
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }).start();
+
             }
         });
         this.addWindowListener(new WindowAdapter() {

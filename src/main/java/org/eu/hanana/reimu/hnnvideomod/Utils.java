@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Utils {
@@ -73,6 +74,14 @@ public class Utils {
 
         buffer.flip();
         return buffer;
+    }
+    static Random random = new Random();
+    public static int getRandomIntInRange(int max, int min) {
+        if (min > max) {
+            throw new IllegalArgumentException("最小值不能大于最大值");
+        }
+        // 使用 nextInt 方法生成 [min, max+1) 范围内的随机整数
+        return random.nextInt(max - min + 1) + min;
     }
     public static void renderImage(BufferedImage imageBuffer, int width, int height) {
         renderImage(convertImageToByteBuffer(imageBuffer),width,height);

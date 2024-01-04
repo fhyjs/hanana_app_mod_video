@@ -162,6 +162,11 @@ public class Danmaku extends JDialog implements IDanmaku{
 
     }
 
+    @Override
+    public void onSeek() {
+
+    }
+
     private class DanmakuPanel extends JPanel {
         private final Color bgColor = new Color(0, 0, 0, 0);
         private DanmakuPanel(){

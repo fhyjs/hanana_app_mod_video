@@ -13,4 +13,6 @@ public interface IDanmaku {
     public void reSize();
     void enable();
     void disable();
+
+    void onSeek();
 }

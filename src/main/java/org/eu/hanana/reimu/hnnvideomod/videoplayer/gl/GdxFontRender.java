@@ -56,6 +56,9 @@ public class GdxFontRender {
             GlDanmaku.runnables.add(()->{
                 parameter.characters = String.valueOf(s);
                 BitmapFont.Glyph glyph = generator.generateData(parameter).getGlyph(s);
+                if (glyph==null){
+                    return;
+                }
                 FontData fontData = new FontData();
                 fontData.w=glyph.width;
                 fontData.font=generator.generateFont(parameter);

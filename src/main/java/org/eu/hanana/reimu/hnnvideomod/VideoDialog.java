@@ -164,6 +164,7 @@ public class VideoDialog extends JDialog {
     }
     private void slider1MouseDragged(MouseEvent e) {
         player.mediaPlayerComponent.mediaPlayer().controls().setTime((long) (slider1.getValue()/(float)slider1.getMaximum()*player.mediaPlayerComponent.mediaPlayer().media().info().duration()));
+        danmaku.onSeek();
     }
     boolean full=false;
     Dimension dimension;

@@ -9,12 +9,14 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import org.eu.hanana.reimu.hnnvideomod.Utils;
 import org.eu.hanana.reimu.hnnvideomod.videoplayer.GlDanmaku;
+import org.eu.hanana.reimu.hnnvideomod.videoplayer.danmaku.Danmaku;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.eu.hanana.reimu.hnnvideomod.videoplayer.GlDanmaku.runnables;
 import static org.lwjgl.opengl.GL11.*;
@@ -27,8 +29,9 @@ public class LibgdxApplication implements ApplicationListener {
     public LibgdxApplication(GlDanmaku glDanmaku) {
         this.glDanmaku=glDanmaku;
     }
-    public ShapeRenderer renderer;
+    ShapeRenderer renderer;
     SpriteBatch batch;
+    public List<Danmaku> danmakus;
     @Override
     public void create() {
         while (glDanmaku==null||glDanmaku.window==0L) {
@@ -38,7 +41,7 @@ public class LibgdxApplication implements ApplicationListener {
                 throw new RuntimeException(e);
             }
         }
-        //GLFW.glfwHideWindow(glDanmaku.window);
+        GLFW.glfwHideWindow(glDanmaku.window);
         GLFW.glfwSetWindowTitle(glDanmaku.window,"LWJGL弹幕渲染器");
 
         renderer = new ShapeRenderer();
@@ -47,15 +50,31 @@ public class LibgdxApplication implements ApplicationListener {
         FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         fontParameter.size=18;
         font=new GdxFontRender(new FreeTypeFontGenerator(Gdx.files.internal("font/微软雅黑.ttf")),fontParameter);
+
+        danmakus = Danmaku.getDanmakus(Utils.getAssets(getClass().getClassLoader(), "video/tst.xml"));
         glDanmaku.init=true;
     }
     private void render0() {
         GL11.glClearColor(0,0,0,0);
         GL11.glClear(GL_COLOR_BUFFER_BIT);
-
-        batch.begin();
-        font.drawString(batch,"12侧翻丰富分啊是否dwee___————！！",100,100, Color.RED);
-        batch.end();
+        List<Danmaku> allOnScreen = Danmaku.getAllOnScreen(danmakus);
+        for (Danmaku danmaku : allOnScreen) {
+            danmaku.draw(batch, font);
+            if (glDanmaku.isPlaying()) {
+                danmaku.move(glDanmaku.width, glDanmaku.height);
+            }
+            danmaku.check(glDanmaku.width, glDanmaku.height);
+        }
+    }
+    public void onTimeChanged(long time){
+        for (Danmaku danmaku : danmakus) {
+            if (Utils.areDoublesEqual(danmaku.timestamp,time/1000f)){
+                if (danmaku.state!= Danmaku.DanmakuState.SHOWN){
+                    danmaku.show(glDanmaku.width,glDanmaku.height);
+                    danmaku.state= Danmaku.DanmakuState.SHOWN;
+                }
+            }
+        }
     }
     @Override
     public void resize(int width, int height) {
@@ -90,7 +109,11 @@ public class LibgdxApplication implements ApplicationListener {
         }
         java.util.List<Runnable> runnableList= new ArrayList<>(runnables);
         for (Runnable runnable : runnableList) {
-            runnable.run();
+            try {
+                runnable.run();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         runnables.clear();
     }

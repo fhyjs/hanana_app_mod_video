@@ -1,5 +1,6 @@
 package org.eu.hanana.reimu.hnnvideomod.videoplayer;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.utils.Array;
@@ -62,7 +63,7 @@ public class GlDanmaku implements IDanmaku {
             lwjgl3ApplicationConfiguration.setTransparentFramebuffer(true);
             lwjgl3ApplicationConfiguration.setBackBufferConfig(8,8,8,8,16,0,0);
             lwjgl3ApplicationConfiguration.setInitialBackgroundColor(new com.badlogic.gdx.graphics.Color(0,0,0,0));
-            new Lwjgl3Application(new LibgdxApplication(this), lwjgl3ApplicationConfiguration);
+            new Lwjgl3Application(application=(new LibgdxApplication(this)), lwjgl3ApplicationConfiguration);
         }).start();
         new Thread(()->{
             try {
@@ -214,9 +215,7 @@ public class GlDanmaku implements IDanmaku {
         height=h;
         GL11.glViewport(0,0,w,h);
     }
-
-
-
+    public LibgdxApplication application;
     private void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -268,7 +267,7 @@ public class GlDanmaku implements IDanmaku {
     }
     @Override
     public void timeChanged(long newTime) {
-
+        ((LibgdxApplication) Gdx.app.getApplicationListener()).onTimeChanged(newTime);
     }
 
     @Override
@@ -321,5 +320,15 @@ public class GlDanmaku implements IDanmaku {
     public void disable() {
         windowCreated=true;
         jDialog.setVisible(false);
+    }
+
+    @Override
+    public void onSeek() {
+        if (application!=null)
+            org.eu.hanana.reimu.hnnvideomod.videoplayer.danmaku.Danmaku.clearAllOnScreen(application.danmakus);
+    }
+
+    public boolean isPlaying() {
+        return owner.player.mediaPlayerComponent.mediaPlayer().status().isPlaying();
     }
 }

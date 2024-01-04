@@ -4,12 +4,13 @@
 
 package org.eu.hanana.reimu.hnnvideomod;
 
-import org.eu.hanana.reimu.hnnvideomod.videoplayer.Danmaku;
-import org.eu.hanana.reimu.hnnvideomod.videoplayer.SpeedCtrlDialog;
-import org.eu.hanana.reimu.hnnvideomod.videoplayer.VolCtrlDialog;
+import org.eu.hanana.reimu.hnnvideomod.videoplayer.*;
+import uk.co.caprica.vlcj.player.embedded.OverlayApi;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Field;
+import java.nio.file.Path;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -20,13 +21,18 @@ public class VideoDialog extends JDialog {
     public final VlcPlayer player;
     public int huiLastTime;
     public String danmakuStr;
-    public Danmaku danmaku;
+    public IDanmaku danmaku;
 
     public VideoDialog(JFrame owner, VlcPlayer player,String danmakuStr) {
         super(owner);
         // 设置无边框
         //setUndecorated(true);
         initComponents();
+        player.videoComponent = getVideo().add(player.mediaPlayerComponent,99);
+        getVideo().remove(danmakuPanel);
+        getVideo().add(danmakuPanel,50);
+        getVideo().remove(hud);
+        getVideo().add(hud,0);
         play.setText("播放");
         this.player=player;
         slider1.setValue(0);
@@ -35,6 +41,13 @@ public class VideoDialog extends JDialog {
         //setResizable(false);
         setTitle("视频播放器(网页后退关闭)");
         this.danmakuStr=danmakuStr;
+
+
+        danmaku=new GlDanmaku(this);
+        if (danmaku.getWindow()!=null)
+            danmaku.getWindow().setVisible(false);
+        player.mediaPlayerComponent.mediaPlayer().overlay().set(danmaku.getWindow());
+
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -91,9 +104,12 @@ public class VideoDialog extends JDialog {
                 showHud();
             }
         });
-        player.mediaPlayerComponent.mediaPlayer().overlay().set(new Danmaku(this));
-        danmaku = (Danmaku) player.mediaPlayerComponent.mediaPlayer().overlay().get();
     }
+
+    public JPanel getDanmakuPanel() {
+        return danmakuPanel;
+    }
+
     private void s1Ticker() throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()){
             if (huiLastTime>0) huiLastTime--;
@@ -117,7 +133,7 @@ public class VideoDialog extends JDialog {
         super.setSize(dimension);
     }
     private void playMouseClicked(MouseEvent e) {
-        if (!danmaku.ready||!player.ready) {
+        if (!danmaku.isReady()||!player.ready) {
             JOptionPane.showMessageDialog(this,"播放器没有加载完成!");
             return;
         }
@@ -181,11 +197,19 @@ public class VideoDialog extends JDialog {
         }
         init();
     }
+
+    public JPanel getFullvideo() {
+        return fullvideo;
+    }
+
     public void init() {
+        getDanmakuPanel().setLocation(0,0);
+        getDanmakuPanel().setSize(getFullvideo().getSize());
         player.videoComponent.setSize(fullvideo.getSize());
         player.mediaPlayerComponent.videoSurfaceComponent().setSize(player.videoComponent.getWidth()-100,player.videoComponent.getHeight()-100);
         hud.setSize((int) player.mediaPlayerComponent.getSize().getWidth(), (int) (player.mediaPlayerComponent.getSize().getHeight()*0.1));
         hud.setLocation(0,player.mediaPlayerComponent.getHeight()-hud.getHeight());
+        danmaku.reSize();
         validate();
     }
     private void showHud(){
@@ -212,12 +236,17 @@ public class VideoDialog extends JDialog {
     private void btnDanmaku(ActionEvent e) {
         if (player.mediaPlayerComponent.mediaPlayer().overlay().enabled()){
             player.mediaPlayerComponent.mediaPlayer().overlay().enable(false);
+            danmaku.disable();
             btnDanmaku.setText("弹幕:关");
+            getWindowFocusListeners();
         }else {
             player.mediaPlayerComponent.mediaPlayer().overlay().enable(true);
+            danmaku.enable();
             btnDanmaku.setText("弹幕:开");
+
         }
     }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         dialogPane = new JPanel();
@@ -229,6 +258,7 @@ public class VideoDialog extends JDialog {
         btnspeed = new JButton();
         btnDanmaku = new JButton();
         button6 = new JButton();
+        danmakuPanel = new JPanel();
         panel2 = new JPanel();
         slider1 = new JSlider();
         panel1 = new JPanel();
@@ -281,6 +311,13 @@ public class VideoDialog extends JDialog {
                         }
                         video.add(hud, JLayeredPane.DEFAULT_LAYER);
                         hud.setBounds(0, 0, 375, 55);
+
+                        //======== danmakuPanel ========
+                        {
+                            danmakuPanel.setLayout(new GridLayout(1, 1));
+                        }
+                        video.add(danmakuPanel, JLayeredPane.DEFAULT_LAYER);
+                        danmakuPanel.setBounds(0, -5, 375, 240);
                     }
                     fullvideo.add(video);
                 }
@@ -355,6 +392,7 @@ public class VideoDialog extends JDialog {
     private JButton btnspeed;
     private JButton btnDanmaku;
     private JButton button6;
+    private JPanel danmakuPanel;
     private JPanel panel2;
     private JSlider slider1;
     private JPanel panel1;

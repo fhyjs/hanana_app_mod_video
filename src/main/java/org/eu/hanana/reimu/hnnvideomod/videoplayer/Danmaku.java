@@ -28,7 +28,7 @@ import static org.eu.hanana.reimu.hnnvideomod.Utils.areDoublesEqual;
 /**
  * @author administer
  */
-public class Danmaku extends JDialog {
+public class Danmaku extends JDialog implements IDanmaku{
     //private static final Logger logger = LogManager.getLogger("DanmakuPlayer");
     private final List<DanmakuData> danmakuData = new ArrayList<>();
     private final List<DanmakuData> onScreenDanmakuData = new ArrayList<>();
@@ -146,6 +146,22 @@ public class Danmaku extends JDialog {
         danmakuData.state = DanmakuData.DanmakuState.HIDDEN;
         iterator.remove(); // 使用迭代器的remove方法来安全地移除元素
     }
+
+    @Override
+    public Window getWindow() {
+        return this;
+    }
+
+    @Override
+    public boolean isReady() {
+        return ready;
+    }
+
+    @Override
+    public void reSize() {
+
+    }
+
     private class DanmakuPanel extends JPanel {
         private final Color bgColor = new Color(0, 0, 0, 0);
         private DanmakuPanel(){

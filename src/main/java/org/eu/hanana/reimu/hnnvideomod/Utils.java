@@ -1,11 +1,14 @@
 package org.eu.hanana.reimu.hnnvideomod;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -29,6 +32,76 @@ public class Utils {
 
         scanner.close();
         return var2;
+    }
+    public static BufferedImage createImageFromByteBuffer(ByteBuffer buffer, int width, int height) {
+        int[] pixels = new int[width * height];
+        int[] pixelArray = new int[4];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int index = (x + (height - y - 1) * width) * 4;
+                pixelArray[0] = buffer.get(index) & 0xFF;
+                pixelArray[1] = buffer.get(index + 1) & 0xFF;
+                pixelArray[2] = buffer.get(index + 2) & 0xFF;
+                pixelArray[3] = buffer.get(index + 3) & 0xFF;
+
+                // Combine the RGBA values into a single int
+                pixels[x + y * width] = (pixelArray[3] << 24) | (pixelArray[0] << 16) | (pixelArray[1] << 8) | pixelArray[2];
+            }
+        }
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        image.setRGB(0, 0, width, height, pixels, 0, width);
+
+        return image;
+    }
+    public static ByteBuffer convertImageToByteBuffer(BufferedImage image) {
+        int[] pixels = new int[image.getWidth() * image.getHeight()];
+        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+
+        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4);
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int pixel = pixels[y * image.getWidth() + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));
+                buffer.put((byte) ((pixel >> 8) & 0xFF));
+                buffer.put((byte) (pixel & 0xFF));
+                buffer.put((byte) ((pixel >> 24) & 0xFF));
+            }
+        }
+
+        buffer.flip();
+        return buffer;
+    }
+    public static void renderImage(BufferedImage imageBuffer, int width, int height) {
+        renderImage(convertImageToByteBuffer(imageBuffer),width,height);
+    }
+    public static void renderImage(ByteBuffer imageBuffer, int width, int height) {
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+        GL11.glPushMatrix();
+
+        // 绘制纹理
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0,
+                GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, imageBuffer);
+
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0, 0);
+        GL11.glVertex2f(100, 100);
+
+        GL11.glTexCoord2f(1, 0);
+        GL11.glVertex2f(100 + width, 100);
+
+        GL11.glTexCoord2f(1, 1);
+        GL11.glVertex2f(100 + width, 100 + height);
+
+        GL11.glTexCoord2f(0, 1);
+        GL11.glVertex2f(100, 100 + height);
+        GL11.glEnd();
+
+        GL11.glPopMatrix();
     }
     public static String getAssets(ClassLoader classLoader, String path) {
         try {

@@ -22,7 +22,6 @@ public class VlcPlayer {
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 
         frame = new VideoDialog(dialog,this,danmakuStr);
-        videoComponent = frame.getVideo().add(mediaPlayerComponent);
         frame.setBounds(100, 100, 800, 600);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
@@ -38,7 +37,6 @@ public class VlcPlayer {
         frame.setVisible(true);
         frame.init();
     }
-
     public void play(String mediaPath) {
         // 获取媒体播放器
         mediaPlayerComponent.mediaPlayer().media().prepare(mediaPath);

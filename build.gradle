@@ -13,12 +13,19 @@ repositories {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+ext{
+    gdxVersion = '1.12.1'
+    lwjglVersion = "3.3.3"
+    jomlVersion = "1.10.5"
+    lwjgl3_awtVersion = "0.1.8"
+    lwjglNatives = "natives-windows"
+}
 repositories {
     maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
+        url 'https://maven.aliyun.com/repository/public/'
     }
     maven {
-        url 'https://maven.aliyun.com/repository/public/'
+        url "https://oss.sonatype.org/content/repositories/snapshots"
     }
     maven {
         url 'https://maven.aliyun.com/repository/central'
@@ -27,13 +34,53 @@ repositories {
     mavenCentral()
 }
 dependencies {
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
+
+    /*
+    // https://mvnrepository.com/artifact/org.slick2d/slick2d-core
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-assimp"
+    implementation "org.lwjgl:lwjgl-bgfx"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-nanovg"
+    implementation "org.lwjgl:lwjgl-nuklear"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-par"
+    implementation "org.lwjgl:lwjgl-stb"
+    implementation "org.lwjgl:lwjgl-vulkan"
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-assimp::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-bgfx::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-nuklear::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-par::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    implementation "org.joml:joml:${jomlVersion}"
+    implementation "org.lwjglx:lwjgl3-awt:${lwjgl3_awtVersion}"
+
+     */
+
+    implementation fileTree("libs")
     compileOnly fileTree("D:\\proj\\hanana_app\\build\\libs\\hanana_app-1.0-SNAPSHOT-all.jar")
     implementation 'uk.co.caprica:vlcj:4.8.2'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation 'org.apache.commons:commons-text:1.10.0'
 }
+dependencies {
 
+}
 test {
     useJUnitPlatform()
 }

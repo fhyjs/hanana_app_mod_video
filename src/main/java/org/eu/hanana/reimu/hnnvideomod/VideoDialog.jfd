@@ -43,6 +43,16 @@ new FormModel {
 								"x": 0
 								"y": 0
 							} )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+								"columns": 1
+							} ) {
+								name: "danmakuPanel"
+							}, new FormLayoutConstraints( null ) {
+								"width": 375
+								"height": 240
+								"x": 0
+								"y": -5
+							} )
 						} )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {

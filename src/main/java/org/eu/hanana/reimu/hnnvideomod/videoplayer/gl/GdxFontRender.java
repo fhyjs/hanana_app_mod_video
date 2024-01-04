@@ -9,6 +9,10 @@ import org.eu.hanana.reimu.hnnvideomod.videoplayer.GlDanmaku;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.ARBFramebufferObject.glGenerateMipmap;
+import static org.lwjgl.opengl.GL11.*;
+
 public class GdxFontRender {
     private final FreeTypeFontGenerator generator;
     private final FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -27,12 +31,18 @@ public class GdxFontRender {
             }
             FontData fontData = fonts.get(c);
             fontData.font.setColor(color);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             fontData.font.draw(batch,String.valueOf(c),x,y);
             x+=fontData.w+2;
         }
     }
     public void dispose(){
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
+        for (FontData value : fonts.values()) {
+            value.font.dispose();
+        }
+        fonts.clear();
     }
     private class Processor extends Thread{
         FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -49,6 +59,7 @@ public class GdxFontRender {
                 FontData fontData = new FontData();
                 fontData.w=glyph.width;
                 fontData.font=generator.generateFont(parameter);
+                glGenerateMipmap(GL_TEXTURE_2D);
                 fonts.put(s,fontData);
             });
         }

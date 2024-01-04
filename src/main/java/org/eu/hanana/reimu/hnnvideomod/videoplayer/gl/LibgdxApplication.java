@@ -44,18 +44,17 @@ public class LibgdxApplication implements ApplicationListener {
         renderer = new ShapeRenderer();
         batch = new SpriteBatch();
         renderer.setProjectionMatrix(batch.getProjectionMatrix());
-        font=new GdxFontRender(new FreeTypeFontGenerator(Gdx.files.internal("font/微软雅黑.ttf")),new FreeTypeFontGenerator.FreeTypeFontParameter());
+        FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        fontParameter.size=18;
+        font=new GdxFontRender(new FreeTypeFontGenerator(Gdx.files.internal("font/微软雅黑.ttf")),fontParameter);
         glDanmaku.init=true;
     }
     private void render0() {
         GL11.glClearColor(0,0,0,0);
         GL11.glClear(GL_COLOR_BUFFER_BIT);
-        renderer.setColor(0,1,1,.6f);
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.rect(0,0,glDanmaku.width,glDanmaku.height);
-        renderer.end();
+
         batch.begin();
-        font.drawString(batch,"123",100,100, Color.RED);
+        font.drawString(batch,"12侧翻丰富分啊是否dwee___————！！",100,100, Color.RED);
         batch.end();
     }
     @Override
@@ -112,5 +111,6 @@ public class LibgdxApplication implements ApplicationListener {
     public void dispose() {
         batch.dispose();
         renderer.dispose();
+        font.dispose();
     }
 }

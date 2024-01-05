@@ -77,6 +77,18 @@ public abstract class Danmaku {
         if (type>=1&&type<=3) {
             return DefaultDanmaku.class;
         }
+        if (type==4) {
+            return BottomDanmaku.class;
+        }
+        if (type==5) {
+            return TopDanmaku.class;
+        }
+        if (type==6) {
+            return ReverseDanmaku.class;
+        }
+        if (type==7) {
+            return PoitionedDanmaku.class;
+        }
         return null;
     }
     public static List<Danmaku> getDanmakus(String xmlData) {
@@ -131,18 +143,28 @@ public abstract class Danmaku {
         }
         return danmakuDataList;
     }
-
+    public void update(){
+        if (this instanceof IProgressDanmaku){
+            IProgressDanmaku progressDanmaku = (IProgressDanmaku) this;
+            progressDanmaku.setProgress((shownTime/60f)/progressDanmaku.getEndTime());
+        }
+    }
+    public float getShowtimeSec(){
+        return shownTime/60f;
+    }
     public void draw(Batch batch, GdxFontRender font){
         batch.begin();
-        GL11.glScalef(getScale(),getScale(),1);
+        batch.setTransformMatrix(batch.getTransformMatrix().scale(getScale(), getScale(), 1));
         Color color = new Color(fontColor);
-        font.drawString(batch,text,x,y, new com.badlogic.gdx.graphics.Color(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,color.getAlpha()/255f));
-        GL11.glScalef(1,1,1);
+        font.drawString(batch,text,x,y, new com.badlogic.gdx.graphics.Color(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,opacity));
+        batch.setTransformMatrix(batch.getTransformMatrix().scale(1/getScale(),1/getScale(), 1));
         batch.end();
     }
 
     public abstract void move(int maxWidth, int maxHeight);
-    public abstract void show(int maxWidth,int maxHeight);
+    public void show(int maxWidth,int maxHeight){
+        shownTime=0;
+    }
 
     public abstract void check(int width, int height);
     public float getScale(){
@@ -162,7 +184,7 @@ public abstract class Danmaku {
     }
     public static void clearAllOnScreen(List<Danmaku> danmakus){
         List<Danmaku> list = getAllOnScreen(danmakus);
-        for (Danmaku danmaku : danmakus) {
+        for (Danmaku danmaku : list) {
             danmaku.state=DanmakuState.HIDDEN;
         }
     }

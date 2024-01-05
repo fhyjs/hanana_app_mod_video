@@ -210,7 +210,7 @@ public class GlDanmaku implements IDanmaku {
     public int width,height;
     JDialog jDialog;
     public void reSize(int w,int h) {
-        glfwSetWindowSize(window,w,h);
+        Gdx.graphics.setWindowedMode(w,h);
         width=w;
         height=h;
         GL11.glViewport(0,0,w,h);

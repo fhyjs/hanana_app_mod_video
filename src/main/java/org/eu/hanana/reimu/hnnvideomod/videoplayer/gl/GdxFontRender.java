@@ -22,8 +22,17 @@ public class GdxFontRender {
         this.parameter=parameter;
     }
     public void drawString(Batch batch, String string, float x, float y, Color color){
+        float ox = x;
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
+            if (c=='/'){
+                if (string.charAt(i+1)=='n'){
+                    y-=17;
+                    x=ox;
+                    i++;
+                    continue;
+                }
+            }
             if (!fonts.containsKey(c)){
                 FreeTypeFontGenerator.FreeTypeFontParameter parameter1 = copyParameter(parameter);
                 new Processor(c,parameter1).start();
@@ -32,8 +41,10 @@ public class GdxFontRender {
             FontData fontData = fonts.get(c);
             fontData.font.setColor(color);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            fontData.font.draw(batch,String.valueOf(c),x,y);
+            BitmapFont.Glyph glyph = fontData.font.getData().getGlyph(c);
+            batch.setColor(color);
+            batch.draw(fontData.font.getRegion().getTexture(),x,y+glyph.height/2f);
+            //fontData.font.draw(batch,String.valueOf(c),x,y);
             x+=fontData.w+2;
         }
     }

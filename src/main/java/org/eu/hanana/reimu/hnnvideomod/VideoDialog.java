@@ -39,7 +39,7 @@ public class VideoDialog extends JDialog {
         slider1.setMaximum(1000000000);
         dimension=getSize();
         //setResizable(false);
-        setTitle("视频播放器(网页后退关闭)");
+        setTitle("VLC视频播放器|LWJGL3弹幕渲染");
         this.danmakuStr=danmakuStr;
 
 

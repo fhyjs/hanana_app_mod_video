@@ -36,13 +36,17 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
     }
     public int getPosX(float x,float y){
         if (x<1&&y<1){
-            return (int) (x*maxWidth);
+            float scaledX = x * getScale();  // 考虑缩放
+            float relativeX = scaledX * maxWidth;
+            return (int) (relativeX / getScale());
         }
         return (int) x;
     }
     public int getPosY(float x,float y){
         if (x<1&&y<1){
-            return (int) (((1-y)*maxHeight)/getScale());
+            float scaledY = y * getScale();  // 考虑缩放
+            float relativeY = (1 - scaledY) * maxHeight;
+            return (int) (relativeY / getScale());
         }
         return (int) y;
     }
@@ -60,6 +64,10 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
         opacityTo= Float.parseFloat(opacityData.split("-")[1]);
         xD= Float.parseFloat(args.get(0));
         yD= Float.parseFloat(args.get(1));
+        if (mode>=6){
+            rotateY= Float.parseFloat(args.get(5));
+            rotateZ= Float.parseFloat(args.get(6));
+        }
     }
     public float getDataByProgress(float f,float t){
         return f+(t-f)*progress;

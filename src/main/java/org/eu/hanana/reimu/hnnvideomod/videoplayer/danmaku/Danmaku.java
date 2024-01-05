@@ -1,6 +1,8 @@
 package org.eu.hanana.reimu.hnnvideomod.videoplayer.danmaku;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eu.hanana.reimu.hnnvideomod.videoplayer.gl.GdxFontRender;
 import org.lwjgl.opengl.GL11;
@@ -70,6 +72,14 @@ public abstract class Danmaku {
      * 显示的文本
      */
     public String text="";
+    /**
+     * Z旋转
+     */
+    public float rotateZ;
+    /**
+     * Y旋转
+     */
+    public float rotateY;
     public Danmaku(){
         this.state= DanmakuState.HIDDEN;
     }
@@ -154,10 +164,14 @@ public abstract class Danmaku {
     }
     public void draw(Batch batch, GdxFontRender font){
         batch.begin();
-        batch.setTransformMatrix(batch.getTransformMatrix().scale(getScale(), getScale(), 1));
+        // 将角度转换为弧度
+        float rotateYRad = MathUtils.degRad * rotateY;
+        float rotateZRad = MathUtils.degRad * rotateZ;
+
+        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(0,0,0),new Vector3(0,rotateYRad,rotateZRad)).scale(getScale(), getScale(), 1));
         Color color = new Color(fontColor);
         font.drawString(batch,text,x,y, new com.badlogic.gdx.graphics.Color(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,opacity));
-        batch.setTransformMatrix(batch.getTransformMatrix().scale(1/getScale(),1/getScale(), 1));
+        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(0,0,0),new Vector3(0,0,0)).scale(1/getScale(),1/getScale(), 1));
         batch.end();
     }
 

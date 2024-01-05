@@ -248,8 +248,17 @@ public class VideoDialog extends JDialog {
         }
     }
 
+    private void aboutBtn(ActionEvent e) {
+        if(danmaku instanceof GlDanmaku){
+            ((GlDanmaku) danmaku).about();
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
+        menuBar1 = new JMenuBar();
+        menu1 = new JMenu();
+        menuItem2 = new JMenuItem();
         dialogPane = new JPanel();
         contentPanel = new JPanel();
         fullvideo = new JPanel();
@@ -270,6 +279,22 @@ public class VideoDialog extends JDialog {
         //======== this ========
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
+
+        //======== menuBar1 ========
+        {
+
+            //======== menu1 ========
+            {
+                menu1.setText("\u89c6\u9891\u64ad\u653e\u5668");
+
+                //---- menuItem2 ----
+                menuItem2.setText("\u5173\u4e8e");
+                menuItem2.addActionListener(e -> aboutBtn(e));
+                menu1.add(menuItem2);
+            }
+            menuBar1.add(menu1);
+        }
+        setJMenuBar(menuBar1);
 
         //======== dialogPane ========
         {
@@ -384,6 +409,9 @@ public class VideoDialog extends JDialog {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
+    private JMenuBar menuBar1;
+    private JMenu menu1;
+    private JMenuItem menuItem2;
     private JPanel dialogPane;
     private JPanel contentPanel;
     private JPanel fullvideo;

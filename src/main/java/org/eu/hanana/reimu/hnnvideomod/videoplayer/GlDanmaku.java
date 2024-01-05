@@ -1,8 +1,9 @@
 package org.eu.hanana.reimu.hnnvideomod.videoplayer;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.*;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.utils.Array;
 import org.eu.hanana.reimu.hnnvideomod.Utils;
 import org.eu.hanana.reimu.hnnvideomod.VideoDialog;
@@ -24,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -42,6 +42,9 @@ public class GlDanmaku implements IDanmaku {
     public boolean needResize;
     private boolean running;
     private FontRender font;
+    private float time;
+
+
     public GlDanmaku(VideoDialog owner){
         this.owner=owner;
         /*
@@ -152,6 +155,8 @@ public class GlDanmaku implements IDanmaku {
         GL11.glVertex2f(0,0);
         GL11.glVertex2f(width,height);
         GL11.glEnd();
+        
+
     }
     public BufferedImage image;
     private boolean windowCreated=true;
@@ -330,5 +335,8 @@ public class GlDanmaku implements IDanmaku {
 
     public boolean isPlaying() {
         return owner.player.mediaPlayerComponent.mediaPlayer().status().isPlaying();
+    }
+    public void about() {
+        application.about();
     }
 }

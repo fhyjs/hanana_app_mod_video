@@ -21,6 +21,8 @@ import java.util.List;
 
 public abstract class Danmaku {
     public DanmakuState state;
+    public int maxWidth;
+    public int maxHeight;
     public int x;
     public int y;
     /**
@@ -144,7 +146,11 @@ public abstract class Danmaku {
                 data.timeInMilliseconds = Long.parseLong(timeInMilliseconds);
                 data.userID = userID;
                 data.content= content;
-                data.init();
+                try {
+                    data.init();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 danmakuDataList.add(data);
             }
 
@@ -163,15 +169,16 @@ public abstract class Danmaku {
         return shownTime/60f;
     }
     public void draw(Batch batch, GdxFontRender font){
+        if (batch.isDrawing()) batch.end();
         batch.begin();
         // 将角度转换为弧度
         float rotateYRad = MathUtils.degRad * rotateY;
         float rotateZRad = MathUtils.degRad * rotateZ;
 
-        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(0,0,0),new Vector3(0,rotateYRad,rotateZRad)).scale(getScale(), getScale(), 1));
+        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(x,y,1),new Vector3(0,rotateYRad,rotateZRad)).scale(getScale(), getScale(), 1));
         Color color = new Color(fontColor);
         font.drawString(batch,text,x,y, new com.badlogic.gdx.graphics.Color(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,opacity));
-        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(0,0,0),new Vector3(0,0,0)).scale(1/getScale(),1/getScale(), 1));
+        batch.setTransformMatrix(batch.getTransformMatrix().setToRotation(new Vector3(x,y,1),new Vector3(0,0,0)).scale(1/getScale(),1/getScale(), 1));
         batch.end();
     }
 

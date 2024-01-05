@@ -3,7 +3,7 @@ package org.eu.hanana.reimu.hnnvideomod.videoplayer.gl;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -11,21 +11,26 @@ import org.eu.hanana.reimu.hnnvideomod.Utils;
 import org.eu.hanana.reimu.hnnvideomod.videoplayer.GlDanmaku;
 import org.eu.hanana.reimu.hnnvideomod.videoplayer.danmaku.Danmaku;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.eu.hanana.reimu.hnnvideomod.videoplayer.GlDanmaku.runnables;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class LibgdxApplication implements ApplicationListener {
     GlDanmaku glDanmaku;
     private GdxFontRender font;
+    private float time;
 
     public LibgdxApplication(GlDanmaku glDanmaku) {
         this.glDanmaku=glDanmaku;
@@ -55,7 +60,7 @@ public class LibgdxApplication implements ApplicationListener {
         font=new GdxFontRender(new FreeTypeFontGenerator(Gdx.files.internal("font/微软雅黑.ttf")),fontParameter);
         timer = new Thread(this::timeTicker);
 
-        danmakus = Danmaku.getDanmakus(Utils.getAssets(getClass().getClassLoader(), "video/tst1.xml"));
+        danmakus = Danmaku.getDanmakus(Utils.getAssets(getClass().getClassLoader(), "video/tst.xml"));
         timer.start();
 
         glDanmaku.init=true;
@@ -65,9 +70,17 @@ public class LibgdxApplication implements ApplicationListener {
         GL11.glClear(GL_COLOR_BUFFER_BIT);
         if (allOnScreen!=null) {
             for (Danmaku danmaku : allOnScreen) {
-                danmaku.draw(batch, font);
+                try {
+                    danmaku.draw(batch, font);
+                }catch (Exception e){
+                    danmaku.state= Danmaku.DanmakuState.HIDDEN;
+                    System.err.println("An error danmaku!");
+                }
             }
         }
+        batch.begin();
+        font.drawString(batch,"FPS:"+Gdx.graphics.getFramesPerSecond(), glDanmaku.width-70,0, Color.RED);
+        batch.end();
     }
     public void onTimeChanged(long time){
         for (Danmaku danmaku : danmakus) {
@@ -75,6 +88,8 @@ public class LibgdxApplication implements ApplicationListener {
                 if (danmaku.state!= Danmaku.DanmakuState.SHOWN){
                     danmaku.show(glDanmaku.width,glDanmaku.height);
                     danmaku.state= Danmaku.DanmakuState.SHOWN;
+                    danmaku.maxHeight=glDanmaku.height;
+                    danmaku.maxWidth=glDanmaku.width;
                 }
             }
         }
@@ -160,5 +175,10 @@ public class LibgdxApplication implements ApplicationListener {
         renderer.dispose();
         font.dispose();
         timer.interrupt();
+    }
+    public void about() {
+        GlDanmaku.runnables.add(()->{
+
+        });
     }
 }

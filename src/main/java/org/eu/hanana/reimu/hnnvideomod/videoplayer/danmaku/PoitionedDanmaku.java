@@ -8,15 +8,17 @@ import java.util.List;
 public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
     private float progress,duration,opacityFrom,opacityTo;
     private int type;//5:简单
-    private int xF,yF;
+    private int xF,yF,xT,yT;
     private float xD,yD;
-    int maxWidth;
-    int maxHeight;
     private final List<String> args=new ArrayList<>();
 
     @Override
     public void move(int maxWidth, int maxHeight) {
         opacity=getDataByProgress(opacityFrom,opacityTo);
+        if (type>=8){
+            x= (int) getDataByProgress(xF,xT);
+            y= (int) getDataByProgress(yF,yT);
+        }
     }
 
     @Override
@@ -27,6 +29,12 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
         this.maxWidth=maxWidth;
         x=getPosX(xD,yD);
         y=getPosY(xD,yD);
+        xF=x;
+        yF=y;
+        if (type>8){
+            xT=getPosX(Float.parseFloat(args.get(7)),Float.parseFloat(args.get(8)));
+            yT=getPosY(Float.parseFloat(args.get(7)),Float.parseFloat(args.get(8)));
+        }
     }
 
     @Override
@@ -53,6 +61,7 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
     @Override
     public void init() {
         args.clear();
+        if (content.endsWith("]")) content+="]";
         content=content.substring(1,content.length()-1);
         args.addAll(List.of(content.split(",")));
         type=args.size();
@@ -64,10 +73,11 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
         opacityTo= Float.parseFloat(opacityData.split("-")[1]);
         xD= Float.parseFloat(args.get(0));
         yD= Float.parseFloat(args.get(1));
-        if (mode>=6){
+        if (mode>6){
             rotateY= Float.parseFloat(args.get(5));
             rotateZ= Float.parseFloat(args.get(6));
         }
+
     }
     public float getDataByProgress(float f,float t){
         return f+(t-f)*progress;

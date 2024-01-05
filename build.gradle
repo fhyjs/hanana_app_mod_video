@@ -18,6 +18,7 @@ ext{
     lwjglVersion = "3.3.3"
     jomlVersion = "1.10.5"
     lwjgl3_awtVersion = "0.1.8"
+    gltfVersion = '-SNAPSHOT'
     lwjglNatives = "natives-windows"
 }
 repositories {
@@ -30,6 +31,7 @@ repositories {
     maven {
         url 'https://maven.aliyun.com/repository/central'
     }
+    maven { url 'https://jitpack.io' }
     mavenLocal()
     mavenCentral()
 }
@@ -39,7 +41,6 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-
 
     /*
     // https://mvnrepository.com/artifact/org.slick2d/slick2d-core

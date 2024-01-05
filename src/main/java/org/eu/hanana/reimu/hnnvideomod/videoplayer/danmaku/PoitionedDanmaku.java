@@ -8,28 +8,44 @@ import java.util.List;
 public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
     private float progress,duration,opacityFrom,opacityTo;
     private int type;//5:简单
+    private int xF,yF;
+    private float xD,yD;
+    int maxWidth;
+    int maxHeight;
     private final List<String> args=new ArrayList<>();
 
     @Override
     public void move(int maxWidth, int maxHeight) {
-        x-= 2;
+        opacity=getDataByProgress(opacityFrom,opacityTo);
     }
 
     @Override
     public void show(int maxWidth, int maxHeight) {
         super.show(maxWidth, maxHeight);
-        x=maxWidth;
-        y=Utils.getRandomIntInRange(maxHeight,0);
-        opacity=
+        progress=0;
+        this.maxHeight=maxHeight;
+        this.maxWidth=maxWidth;
+        x=getPosX(xD,yD);
+        y=getPosY(xD,yD);
     }
 
     @Override
     public void check(int width, int height) {
-        if (x<0){
+        if (progress>1)
             state=DanmakuState.HIDDEN;
-        }
     }
-
+    public int getPosX(float x,float y){
+        if (x<1&&y<1){
+            return (int) (x*maxWidth);
+        }
+        return (int) x;
+    }
+    public int getPosY(float x,float y){
+        if (x<1&&y<1){
+            return (int) (((1-y)*maxHeight)/getScale());
+        }
+        return (int) y;
+    }
     @Override
     public void init() {
         args.clear();
@@ -42,8 +58,12 @@ public class PoitionedDanmaku extends Danmaku implements IProgressDanmaku{
         opacityData=opacityData.substring(1,opacityData.length()-1);
         opacityFrom= Float.parseFloat(opacityData.split("-")[0]);
         opacityTo= Float.parseFloat(opacityData.split("-")[1]);
+        xD= Float.parseFloat(args.get(0));
+        yD= Float.parseFloat(args.get(1));
     }
-
+    public float getDataByProgress(float f,float t){
+        return f+(t-f)*progress;
+    }
     @Override
     public float getEndTime() {
         return duration;
